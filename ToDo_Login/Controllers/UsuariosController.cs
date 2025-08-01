@@ -87,7 +87,38 @@ namespace ToDo_Login.Controllers
         }
 
 
+         [HttpPost("ConfirmUser")]
+            public IActionResult ConfirmUser(LoginDTO loginDTO)
+            {
+                if (loginDTO == null || string.IsNullOrEmpty(loginDTO.email) || string.IsNullOrEmpty(loginDTO.password))
+                {
+                    return BadRequest(new { success = false, message = "Email y contraseña son requeridos." });
+                }
 
+                try
+                {
+                    var usuario = dbContext.Usuarios.FirstOrDefault(x => x.email == loginDTO.email && x.password == loginDTO.password);
+
+                    if (usuario != null)
+                    {
+                        if (usuario.IsConfirmed)
+                        {
+                            return BadRequest(new { success = false, message = "Usuario ya confirmado." });
+                        }
+
+                        usuario.IsConfirmed = true;
+                        dbContext.SaveChanges();
+                        return Ok(new { success = true, message = "Usuario confirmado exitosamente." });
+                    }
+
+                    return NotFound(new { success = false, message = "Usuario no encontrado o contraseña incorrecta." });
+                }
+                catch (Exception ex)
+                {
+                    // Registra el error (opcional)
+                    return StatusCode(500, new { success = false, message = "Error interno del servidor." });
+                }
+            }
 
 
         [HttpGet]
