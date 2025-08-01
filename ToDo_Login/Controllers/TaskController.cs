@@ -51,6 +51,47 @@ namespace ToDo_Login.Controllers
         }
 
 
+         // Obtener tarea por ID
+        [HttpGet("{id}")]
+        public IActionResult ObtenerTarea(int id)
+        {
+            var tarea = dbContext.Tareas.Find(id);
+
+            if (tarea == null)
+            {
+                return NotFound(new { success = false, message = "Tarea no encontrada." });
+            }
+
+            return Ok(tarea);
+        }
+
+        // Actualizar tarea
+        [HttpPut("{id}")]
+        public IActionResult ActualizarTarea(int id, TareaDTO tareaDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var tarea = dbContext.Tareas.Find(id);
+
+            if (tarea == null)
+            {
+                return NotFound(new { success = false, message = "Tarea no encontrada." });
+            }
+
+            tarea.title = tareaDTO.title;
+            tarea.description = tareaDTO.description;
+            tarea.status = tareaDTO.status;
+            tarea.updated_at = DateTime.UtcNow;
+
+            dbContext.SaveChanges();
+
+            return Ok(new { success = true, message = "Tarea actualizada exitosamente." });
+        }
+
+
 
     }
 }
