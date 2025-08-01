@@ -91,6 +91,45 @@ namespace ToDo_Login.Controllers
             return Ok(new { success = true, message = "Tarea actualizada exitosamente." });
         }
 
+        // Eliminar tarea
+        [HttpDelete("{id}")]
+        public IActionResult EliminarTarea(int id)
+        {
+            var tarea = dbContext.Tareas.Find(id);
+
+            if (tarea == null)
+            {
+                return NotFound(new { success = false, message = "Tarea no encontrada." });
+            }
+
+            dbContext.Tareas.Remove(tarea);
+            dbContext.SaveChanges();
+
+            return Ok(new { success = true, message = "Tarea eliminada exitosamente." });
+        }
+
+        // Buscar tareas por nombre
+        [HttpGet("buscar/{title}")]
+        public IActionResult BuscarTareas(string title, int userId) // Agrega userId como parámetro
+        {
+            // Verificar si el usuario existe
+            var usuario = dbContext.Usuarios.Find(userId);
+            if (usuario == null)
+            {
+                return BadRequest(new { success = false, message = "ID de usuario no válido." });
+            }
+
+            var tareas = dbContext.Tareas
+                .Where(t => t.user_id == userId && t.title.Contains(title))
+                .ToList();
+
+            if (tareas == null || tareas.Count == 0)
+            {
+                return NotFound(new { success = false, message = "No se encontraron tareas con ese nombre." });
+            }
+
+            return Ok(tareas);
+        }
 
 
     }
