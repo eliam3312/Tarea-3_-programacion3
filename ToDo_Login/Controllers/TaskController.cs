@@ -131,6 +131,25 @@ namespace ToDo_Login.Controllers
             return Ok(tareas);
         }
 
+         // Listar tareas por usuario
+        [HttpGet("usuario/{userId}")]
+        public IActionResult ListarTareasPorUsuario(int userId)
+        {
+            // Verificar si el usuario existe
+            var usuario = dbContext.Usuarios.Find(userId);
+            if (usuario == null)
+            {
+                return BadRequest(new { success = false, message = "ID de usuario no válido." });
+            }
+
+            // Obtener las tareas del usuario
+            var tareas = dbContext.Tareas
+                .Where(t => t.user_id == userId)
+                .ToList();
+
+            return Ok(tareas);
+        }
+
 
     }
 }
